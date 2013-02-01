@@ -94,12 +94,6 @@ def method(view):
     view._jsonrpc_method = True
     return view
 
-def method_func(func, cls):
-    """
-    Decorator to mark a function as a JSON-RPC method of a class.
-    """
-    cls.methods.append(func)
-
 
 class JsonRpcHandler(JSONMessageHandler):
 

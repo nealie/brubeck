@@ -1,48 +1,23 @@
 import pyjd # dummy in pyjs
 
 from pyjamas.ui.RootPanel import RootPanel
-from pyjamas.ui.TextArea import TextArea
+from pyjamas.ui.TextBox import TextBox
 from pyjamas.ui.Label import Label
 from pyjamas.ui.Button import Button
 from pyjamas.ui.HTML import HTML
 from pyjamas.ui.VerticalPanel import VerticalPanel
 from pyjamas.ui.HorizontalPanel import HorizontalPanel
-from pyjamas.ui.ListBox import ListBox
 from pyjamas.JSONService import JSONProxy
 
 class JSONRPCExample:
     def onModuleLoad(self):
         self.TEXT_WAITING = "Waiting for response..."
         self.TEXT_ERROR = "Server Error"
-        self.METHOD_HELLO = "hello"
-
-        self.methods = [self.METHOD_HELLO]
 
         self.remote = JSONProxy("../api", ["hello"])
 
-        self.status=Label()
-        self.text_area = TextArea()
-        self.text_area.setText("""{'Test'} [\"String\"]
-\tTest Tab
-Test Newline\n
-after newline
-""" + r"""Literal String:
-{'Test'} [\"String\"]
-""")
-        self.text_area.setCharacterWidth(80)
-        self.text_area.setVisibleLines(8)
-
-        self.method_list = ListBox()
-        self.method_list.setName("hello")
-        self.method_list.setVisibleItemCount(1)
-        for method in self.methods:
-            self.method_list.addItem(method)
-        self.method_list.setSelectedIndex(0)
-
-        method_panel = HorizontalPanel()
-        method_panel.add(HTML("Remote string method to call: "))
-        method_panel.add(self.method_list)
-        method_panel.setSpacing(8)
+        self.status = Label()
+        self.text_box = TextBox()
 
         self.button_send = Button("Send", self)
 
@@ -54,14 +29,12 @@ after newline
         <p>This example demonstrates the calling of server services with
            <a href="http://json-rpc.org/">JSON-RPC</a>.
         </p>
-        <p>Enter some text below, and press a button to send the text
-           to an Echo service on your server. An echo service simply sends the exact same text back that it receives.
-           </p>"""
+        <p>Enter your name below.</p>"""
 
         panel = VerticalPanel()
         panel.add(HTML(info))
-        panel.add(self.text_area)
-        panel.add(method_panel)
+        panel.add(self.text_box)
+        #panel.add(method_panel)
         panel.add(buttons)
         panel.add(self.status)
 
@@ -69,12 +42,8 @@ after newline
 
     def onClick(self, sender):
         self.status.setText(self.TEXT_WAITING)
-        method = self.methods[self.method_list.getSelectedIndex()]
-        text = self.text_area.getText()
-
-        # demonstrate proxy & callMethod()
-        if method == self.METHOD_HELLO:
-            id = self.remote.hello(text, self)
+        text = self.text_box.getText()
+        id = self.remote.hello(text, self)
 
     def onRemoteResponse(self, response, request_info):
         self.status.setText(response)
@@ -103,7 +72,6 @@ if __name__ == '__main__':
     # from the same URI base as the URL, it's all a bit messy...
     # Use the second pyjd.setup if you're using apache-php locally
     # as described in the README
-    #pyjd.setup("http://127.0.0.1:8000/public/JSONRPCExample.html")
     pyjd.setup("http://127.0.0.1:6767/hello/JSONRPCExample.html")
     app = JSONRPCExample()
     app.onModuleLoad()
