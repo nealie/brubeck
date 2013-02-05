@@ -76,37 +76,35 @@ class JsonRpcExecError(JsonRpcError):
         return "{0}: {1}\n{2}".format(self.where, self.why, self.how)
 
 
-def embed_methods(cls):
-    """
-    Decorator to allow JSON-RPC methods to be embedded in a class definition.
-
-    Store the names of the methods decorated with the method decorator.
-    """
-    for name, method in cls.__dict__.iteritems():
-        if hasattr(method, "_jsonrpc_method"):
-            cls._method_names.append(name)
-    return cls
-
-def method(view):
+def method(func):
     """
     Decorator to mark a method as a JSON-RPC method.
     """
-    view._jsonrpc_method = True
-    return view
+    func._jsonrpc_method = True
+    return func
 
 
 class JsonRpcHandler(JSONMessageHandler):
+    """
+    Handler class supporting JSON-RPC.
+
+    Methods that are to be exposed as JSON-RPC methods must be 'marked' using the method decorator.
+    This ensures that only such marked methods may be executed.
+    """
 
     VERSION = "version"
     JSONRPC = "jsonrpc"
 
     class __metaclass__(type):
         """
-        Metaclass to give each derived class a unique set of methods.
+        Metaclass to give each derived class a unique set of methods marked by the method decorator.
         """
-        def __init__(cls, name, bases, dct):
+        def __init__(cls, name, bases, attrs):
             cls._method_names = []
-            type.__init__(cls, name, bases, dct)
+            for name, value in attrs.iteritems():
+                if getattr(value, "_jsonrpc_method", False):
+                    cls._method_names.append(name)
+            type.__init__(cls, name, bases, attrs)
 
     def __init__(self, *args, **kwargs):
         """

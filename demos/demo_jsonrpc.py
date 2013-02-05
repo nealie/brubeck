@@ -2,10 +2,9 @@
 
 from brubeck.request_handling import Brubeck
 from brubeck.connections import Mongrel2Connection
-from brubeck.jsonrpc import JsonRpcHandler, embed_methods, method
+from brubeck.jsonrpc import JsonRpcHandler, method
 
 
-@embed_methods
 class DemoJsonHandler(JsonRpcHandler):
     @method
     def hello(self, name):
